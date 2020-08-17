@@ -57,6 +57,7 @@ export default defineConfig({
               name: 'welcome',
               icon: 'smile',
               component: './Welcome',
+              hideInMenu:true,
             },
             {
               path: '/admin',
@@ -64,6 +65,7 @@ export default defineConfig({
               icon: 'crown',
               component: './Admin',
               // authority: ['admin'],
+              hideInMenu:true,
               routes: [
                 {
                   path: '/admin/sub-page',
@@ -71,6 +73,7 @@ export default defineConfig({
                   icon: 'smile',
                   component: './Welcome',
                   authority: ['admin'],
+                  hideInMenu:true,
                 },
               ],
             },
@@ -79,34 +82,45 @@ export default defineConfig({
               icon: 'table',
               path: '/list',
               component: './ListTableList',
+              hideInMenu:true,
             },
             {
+              // path: '/admin',
               name: '模板',
-              icon: 'smile',
-              path: '/tmpl',
-              component: './Tmpl',
+              icon: 'crown',
+              // component: './Admin',
+              // authority: ['admin'],
+              routes: [
+                {
+                  name: '模板',
+                  icon: 'smile',
+                  path: '/tmpl',
+                  component: './Tmpl',
+                },
+                {
+                  name: '模板资源',
+                  icon: 'smile',
+                  path: '/tmpl_source_list/:tmplid',
+                  component: './TmplSource',
+                  hideInMenu:true,
+                },
+                {
+                  name: '新增模板资源',
+                  icon: 'smile',
+                  path: '/tmpl_source/add',
+                  component: './TmplSourceAdd',
+                  hideInMenu:true,
+                },
+                {
+                  name: '编辑模板资源',
+                  icon: 'smile',
+                  path: '/tmpl_source/edit/:tsid',
+                  component: './TmplSourceEdit',
+                  hideInMenu:true,
+                },
+              ],
             },
-            {
-              name: '模板资源',
-              icon: 'smile',
-              path: '/tmpl_source_list/:tmplid',
-              component: './TmplSource',
-              hideInMenu:true,
-            },
-            {
-              name: '新增模板资源',
-              icon: 'smile',
-              path: '/tmpl_source/add',
-              component: './TmplSourceAdd',
-              hideInMenu:true,
-            },
-            {
-              name: '编辑模板资源',
-              icon: 'smile',
-              path: '/tmpl_source/edit/:tsid',
-              component: './TmplSourceEdit',
-              hideInMenu:true,
-            },
+            
             {
               name: '空白页面',
               icon: 'smile',
