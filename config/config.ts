@@ -100,14 +100,14 @@ export default defineConfig({
                 {
                   name: '模板资源',
                   icon: 'smile',
-                  path: '/tmpl_source_list/:tmplid',
+                  path: '/tmpl_source/list/:tmplid',
                   component: './TmplSource',
                   hideInMenu:true,
                 },
                 {
                   name: '新增模板资源',
                   icon: 'smile',
-                  path: '/tmpl_source/add',
+                  path: '/tmpl_source/add/:tmplid',
                   component: './TmplSourceAdd',
                   hideInMenu:true,
                 },

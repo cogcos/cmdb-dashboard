@@ -25,59 +25,79 @@ const handleAdd = async (fields: TmplSourceListItem) => {
     }
 };
 
-const FormAdd = () => {
+const RadioVpcId = (props) => {
+    const [isLoad, setIsLoad] = useState(false);
+    const [loadData, setLoadData] = useState([]);
+    
+    useEffect(() => {
+        queryRule(props.tmplid).then((resp)=>{
+// console.log(resp)
+setLoadData(resp)
+setIsLoad(true)
+        })
+    },[])
+    if (isLoad == false) {
+        return <div>Loading</div>;
+    }else{
+        return (
+            <Form.Item label="Vpc" name="vpc_id">
+                <Radio.Group  buttonStyle="solid">
+                {loadData.map((item) => (
+                    <Radio.Button value="{item.id}" >{item.name}</Radio.Button>
+                ))}
+                </Radio.Group>
+            </Form.Item>
+        )
+    }
+}
+
+const FormAdd = (props) => {
     const [componentRole, setComponentRole] = useState('vpc');
     const [vpcipliststatus, setVpcipliststatus] = useState(false);
+    
     const handleClick = (roleName:string)=>{
         setComponentRole(roleName)
     }
     return (
-        <>
-        <Form>
-            <Form.Item label="Name" name="name">
-                <Input placeholder="name" allowClear />
-            </Form.Item>
-            <Form.Item label="Role" name="role">
-                <Radio.Group defaultValue="vpc" buttonStyle="solid">
-                    <Radio.Button value="vpc" onClick={()=>{handleClick('vpc')}}>vpc</Radio.Button>
-                    <Radio.Button value="ec2" onClick={()=>{handleClick('ec2')}}>ec2</Radio.Button>
-                    <Radio.Button value="elb" onClick={()=>{handleClick('elb')}}>elb</Radio.Button>
-                    <Radio.Button value="rds" onClick={()=>{handleClick('rds')}}>rds</Radio.Button>
-                    <Radio.Button value="cache" onClick={()=>{handleClick('cache')}}>cache</Radio.Button>
-                    <Radio.Button value="s3" onClick={()=>{handleClick('s3')}}>s3</Radio.Button>
-                    <Radio.Button value="msk" onClick={()=>{handleClick('msk')}}>msk</Radio.Button>
-                </Radio.Group>
-            </Form.Item>
-            
-            <Form.Item label="remark" name="remark">
-                <Input placeholder="remark" allowClear />
-            </Form.Item>
-            <Form.Item label="logicalid" name="logicalid">
-                <Input placeholder="logicalid" allowClear />
-            </Form.Item>
-            <Form.Item label="type" name="type">
-                <Input placeholder="type" allowClear />
-            </Form.Item>
-            <Form.Item label="ssh_user" name="ssh_user">
-                <Input placeholder="ssh_user" allowClear />
-            </Form.Item>
-            <Form.Item label="ssh_port" name="ssh_port">
-                <InputNumber min={1} max={65536} defaultValue={22}  />
-            </Form.Item>
-            <Form.Item label="" name="submit">
-                <Button type="primary">submit</Button>
-            </Form.Item>
-        </Form>
-        </>
+        <PageContainer>
+            <Form>
+                <Form.Item label="Name" name="name">
+                    <Input placeholder="name" allowClear />
+                </Form.Item>
+                <Form.Item label="Role" name="role">
+                    <Radio.Group defaultValue="vpc" buttonStyle="solid">
+                        <Radio.Button value="vpc" onClick={()=>{handleClick('vpc')}}>vpc</Radio.Button>
+                        <Radio.Button value="ec2" onClick={()=>{handleClick('ec2')}}>ec2</Radio.Button>
+                        <Radio.Button value="elb" onClick={()=>{handleClick('elb')}}>elb</Radio.Button>
+                        <Radio.Button value="rds" onClick={()=>{handleClick('rds')}}>rds</Radio.Button>
+                        <Radio.Button value="cache" onClick={()=>{handleClick('cache')}}>cache</Radio.Button>
+                        <Radio.Button value="s3" onClick={()=>{handleClick('s3')}}>s3</Radio.Button>
+                        <Radio.Button value="msk" onClick={()=>{handleClick('msk')}}>msk</Radio.Button>
+                    </Radio.Group>
+                </Form.Item>
+                <RadioVpcId tmplid = {props.match.params.tmplid}/>       
+                <Form.Item label="remark" name="remark">
+                    <Input placeholder="remark" allowClear />
+                </Form.Item>
+                <Form.Item label="logicalid" name="logicalid">
+                    <Input placeholder="logicalid" allowClear />
+                </Form.Item>
+                <Form.Item label="type" name="type">
+                    <Input placeholder="type" allowClear />
+                </Form.Item>
+                <Form.Item label="ssh_user" name="ssh_user">
+                    <Input placeholder="ssh_user" allowClear />
+                </Form.Item>
+                <Form.Item label="ssh_port" name="ssh_port">
+                    <InputNumber min={1} max={65536} defaultValue={22}  />
+                </Form.Item>
+                <Form.Item label="" name="submit">
+                    <Button type="primary">submit</Button>
+                </Form.Item>
+            </Form>
+        </PageContainer>
   );
 };
 
 
-export default () => {
-
-  return (
-    <PageContainer>
-        <FormAdd />
-    </PageContainer>
-  );
-};
+export default FormAdd ;

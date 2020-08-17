@@ -10,12 +10,12 @@ export async function addRule(params: TmplSourceListItem) {
     },
   });
 }
-export async function queryRule(params?: TmplSourceListParams,tmplid?: number) {
+export async function queryRule(tmplid?: number) {
     // console.log(REACT_APP_ENV)
     // params.id = tmplid;
     // console.log(params)
   return request('/api/tmplsourcelistvpcbytmplid', {
-    params: Object.assign(params,{id: tmplid}),
+    params: Object.assign({id: tmplid}),
     // params,
   });
 }
