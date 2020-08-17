@@ -61,7 +61,7 @@ const menuDataRender = (menuList: MenuDataItem[]): MenuDataItem[] =>
 
 const defaultFooterDom = (
   <DefaultFooter
-    copyright={`${new Date().getFullYear()} 众安国际运维组出品`}
+    copyright={`${new Date().getFullYear()} 运维组出品`}
     // links={[
     //   {
     //     key: 'Ant Design Pro',

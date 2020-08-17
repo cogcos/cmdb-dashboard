@@ -16,7 +16,7 @@ const proSettings: DefaultSettings = {
   menu: {
     locale: false,
   },
-  title: '众安国际运维',
+  title: '运维',
   pwa: false,
   iconfontUrl: '',
 };
