@@ -10,7 +10,7 @@ export async function addRule(params: TmplSourceListItem) {
     },
   });
 }
-export async function queryRule(tmplid?: number) {
+export async function queryVpcList(tmplid?: number) {
     // console.log(REACT_APP_ENV)
     // params.id = tmplid;
     // console.log(params)
@@ -18,4 +18,21 @@ export async function queryRule(tmplid?: number) {
     params: Object.assign({id: tmplid}),
     // params,
   });
+}
+export async function queryTsInfo(tsid?: string) {
+    // console.log(REACT_APP_ENV)
+    // params.id = tmplid;
+    // console.log(params)
+  return request('/api/tmplsource', {
+    params: Object.assign({id: tsid}),
+    // params,
+  });
+}
+export async function updateRule(params: TmplSourceListItem) {
+    return request('/api/tmplsource', {
+      method: 'PUT',
+      data: {
+        ...params,
+      },
+    });
 }

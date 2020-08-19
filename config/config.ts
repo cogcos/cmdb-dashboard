@@ -118,6 +118,12 @@ export default defineConfig({
                   component: './TmplSourceEdit',
                   hideInMenu:true,
                 },
+                {
+                  name: '实例',
+                  icon: 'smile',
+                  path: '/project',
+                  component: './Project',
+                },
               ],
             },
             

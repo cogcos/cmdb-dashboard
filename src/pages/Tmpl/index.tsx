@@ -8,7 +8,7 @@ import CreateForm from './components/CreateForm';
 import UpdateForm, { FormValueType } from './components/UpdateForm';
 import { TmplListItem } from './data.d';
 import { queryRule, updateRule, addRule, removeRule } from './service';
-// import Link from '@umi/link';
+import { history } from 'umi';
 
 /**
  * 添加节点
@@ -117,19 +117,16 @@ const TableList: React.FC<{}> = () => {
       valueType: 'option',
       render: (_, record) => (
         <>
-          {/* <Link to={`/tmpl_source/${record.id}`}>go</Link>; */}
-          <a href={`/tmpl_source_list/${record.id}`}>
             <Button type="primary" shape="round"
               onClick={() => {
-                // console.log(record)
-                // handleUpdateModalVisible(true);
-                // setStepFormValues(record);
+                history.push({
+                  pathname: '/tmpl_source/list/'+record.id
+                });
 
               }}
             >
               配置
             </Button>
-          </a>
           <Divider type="vertical" />
           <Button danger
             onClick={async () => {

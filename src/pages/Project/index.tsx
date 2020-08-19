@@ -6,9 +6,27 @@ import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
 
 import CreateForm from './components/CreateForm';
 import UpdateForm, { FormValueType } from './components/UpdateForm';
-import { TmplSourceListItem } from './data';
-import { queryRule, addRule, removeRule } from './service';
+import { ProjectListItem } from './data';
+import { queryRule, updateRule, addRule, removeRule } from './service';
 import { history } from 'umi';
+
+/**
+ * 添加节点
+ * @param fields
+ */
+const handleAdd = async (fields: ProjectListItem) => {
+  const hide = message.loading('正在添加');
+  try {
+    await addRule({ ...fields });
+    hide();
+    message.success('添加成功');
+    return true;
+  } catch (error) {
+    hide();
+    message.error('添加失败请重试！');
+    return false;
+  }
+};
 
 /**
  * 更新节点
@@ -20,7 +38,7 @@ const handleUpdate = async (fields: FormValueType) => {
     await updateRule({
       name: fields.name,
       id: fields.id,
-
+      ssh_key_path: fields.ssh_key_path,
     });
     hide();
 
@@ -37,7 +55,7 @@ const handleUpdate = async (fields: FormValueType) => {
  *  删除节点
  * @param selectedRows
  */
-const handleRemove = async (selectedRows: TmplSourceListItem) => {
+const handleRemove = async (selectedRows: ProjectListItem) => {
   const hide = message.loading('正在删除');
   if (!selectedRows) return true;
   try {
@@ -54,13 +72,13 @@ const handleRemove = async (selectedRows: TmplSourceListItem) => {
   }
 };
 
-const TableList: React.FC<{}> = (props) => {
+const TableList: React.FC<{}> = () => {
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
   const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
   const [stepFormValues, setStepFormValues] = useState({});
   const actionRef = useRef<ActionType>();
-  const [selectedRowsState, setSelectedRows] = useState<TmplSourceListItem[]>([]);
-  const columns: ProColumns<TmplSourceListItem>[] = [
+  const [selectedRowsState, setSelectedRows] = useState<ProjectListItem[]>([]);
+  const columns: ProColumns<ProjectListItem>[] = [
     {
       title: '名称',
       dataIndex: 'name',
@@ -70,47 +88,11 @@ const TableList: React.FC<{}> = (props) => {
           message: '名称为必填项',
         },
       ],
-      hideInSearch: true,
     },
     {
-      title: 'role',
-      dataIndex: 'role',
-      rules: [
-        {
-          required: true,
-          message: 'role为必填项',
-        },
-      ],
-      hideInSearch: true,
-    },
-    {
-      title: '备注',
-      dataIndex: 'remark',
+      title: 'sshKeyPath',
+      dataIndex: 'ssh_key_path',
       valueType: 'textarea',
-      hideInSearch: true,
-    },
-    {
-      title: 'logicalid',
-      dataIndex: 'logicalid',
-      valueType: 'text',
-      hideInSearch: true,
-    },
-    {
-      title: 'aws-type',
-      dataIndex: 'type',
-      valueType: 'text',
-      hideInSearch: true,
-    },
-    {
-      title: 'ssh_user',
-      dataIndex: 'ssh_user',
-      valueType: 'text',
-      hideInSearch: true,
-    },
-    {
-      title: 'ssh_port',
-      dataIndex: 'ssh_port',
-      valueType: 'text',
       hideInSearch: true,
     },
     {
@@ -135,15 +117,16 @@ const TableList: React.FC<{}> = (props) => {
       valueType: 'option',
       render: (_, record) => (
         <>
-          <Button type="primary" shape="round"
-            onClick={() => {
-              history.push({
-                pathname: '/tmpl_source/edit/'+record.id
-              });
-            }}
-          >
-            配置
-          </Button>
+            <Button type="primary" shape="round"
+              onClick={() => {
+                history.push({
+                  pathname: '/tmpl_source/list/'+record.id
+                });
+
+              }}
+            >
+              配置
+            </Button>
           <Divider type="vertical" />
           <Button danger
             onClick={async () => {
@@ -157,25 +140,22 @@ const TableList: React.FC<{}> = (props) => {
       ),
     },
   ];
-  // console.log(props.match.params.tmplid)
+
   return (
     <PageContainer>
-      <ProTable<TmplSourceListItem>
+      <ProTable<ProjectListItem>
         headerTitle="查询表格"
         actionRef={actionRef}
         rowKey="id"
         toolBarRender={() => [
-          <Button type="primary" onClick={() => {
-            history.push({
-              pathname: '/tmpl_source/add/'+props.match.params.tmplid
-            });
-          }}>
+          <Button type="primary" onClick={() => handleModalVisible(true)}>
             <PlusOutlined /> 新建
           </Button>,
         ]}
         // request={(params, sorter, filter) => queryRule({ ...params, sorter, filter })}
-        request={(params, sorter, filter) => queryRule({ ...params },props.match.params.tmplid)}
+        request={(params, sorter, filter) => queryRule({ ...params })}
         // request={(params, sorter, filter) => {
+        //   console.log(props);
         //   return new Promise((reslove,reject)=>{
         //     queryRule({ ...params }).then(resp=>{
         //       console.log(resp,params)
@@ -190,18 +170,18 @@ const TableList: React.FC<{}> = (props) => {
           onChange: (_, selectedRows) => setSelectedRows(selectedRows),
         }}
       />
-      {/* {selectedRowsState?.length > 0 && (
+      {selectedRowsState?.length > 0 && (
         <FooterToolbar
-          extra={
-            <div>
-              已选择 <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a> 项&nbsp;&nbsp;
-              <span>
-                服务调用次数总计 {selectedRowsState.reduce((pre, item) => pre + item.callNo, 0)} 万
-              </span>
-            </div>
-          }
+          // extra={
+          //   <div>
+          //     已选择 <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a> 项&nbsp;&nbsp;
+          //     <span>
+          //       服务调用次数总计 {selectedRowsState.reduce((pre, item) => pre + item.callNo, 0)} 万
+          //     </span>
+          //   </div>
+          // }
         >
-          <Button
+          {/* <Button
             onClick={async () => {
               await handleRemove(selectedRowsState);
               setSelectedRows([]);
@@ -210,9 +190,47 @@ const TableList: React.FC<{}> = (props) => {
           >
             批量删除
           </Button>
-          <Button type="primary">批量审批</Button>
+          <Button type="primary">批量审批</Button> */}
         </FooterToolbar>
-      )} */}
+      )}
+      <CreateForm onCancel={() => handleModalVisible(false)} modalVisible={createModalVisible}>
+        <ProTable<ProjectListItem, ProjectListItem>
+          onSubmit={async (value) => {
+            const success = await handleAdd(value);
+            if (success) {
+              handleModalVisible(false);
+              if (actionRef.current) {
+                actionRef.current.reload();
+              }
+            }
+          }}
+          rowKey="id"
+          type="form"
+          columns={columns}
+          rowSelection={{}}
+        />
+      </CreateForm>
+      {stepFormValues && Object.keys(stepFormValues).length ? (
+        <UpdateForm
+          onSubmit={async (value) => {
+            const success = await handleUpdate(value);
+            if (success) {
+              handleUpdateModalVisible(false);
+              setStepFormValues({});
+              if (actionRef.current) {
+                actionRef.current.reload();
+              }
+            }
+          }}
+          onCancel={() => {
+            handleUpdateModalVisible(false);
+            setStepFormValues({});
+            console.log(stepFormValues)
+          }}
+          updateModalVisible={updateModalVisible}
+          values={stepFormValues}
+        />
+      ) : null}
     </PageContainer>
   );
 };

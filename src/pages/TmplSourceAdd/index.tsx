@@ -3,9 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { Form,message,Radio,Input,InputNumber,Button,Modal } from 'antd';
 import styles from './index.less';
 import { TmplSourceListItem } from './data';
-import { queryRule, updateRule, addRule, removeRule } from './service';
+import { queryRule,  addRule } from './service';
 import { PageContainer } from '@ant-design/pro-layout';
-import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
+import { history } from 'umi';
 
 /**
  * 添加节点
@@ -25,25 +25,29 @@ const handleAdd = async (fields: TmplSourceListItem) => {
     }
 };
 
-const RadioVpcId = (props) => {
+const RadioVpcList = (props:any) => {
     const [isLoad, setIsLoad] = useState(false);
     const [loadData, setLoadData] = useState([]);
     
     useEffect(() => {
         queryRule(props.tmplid).then((resp)=>{
-// console.log(resp)
-setLoadData(resp)
-setIsLoad(true)
+            // console.log(resp)
+            setLoadData(resp)
+            setIsLoad(true)
         })
     },[])
-    if (isLoad == false) {
+    if (props.vpdListVisible==false){
+        return (
+            <></>
+        )
+    }else if (isLoad == false) {
         return <div>Loading</div>;
     }else{
         return (
             <Form.Item label="Vpc" name="vpc_id">
                 <Radio.Group  buttonStyle="solid">
                 {loadData.map((item) => (
-                    <Radio.Button value="{item.id}" >{item.name}</Radio.Button>
+                    <Radio.Button value={item.id} >{item.name}</Radio.Button>
                 ))}
                 </Radio.Group>
             </Form.Item>
@@ -51,22 +55,39 @@ setIsLoad(true)
     }
 }
 
-const FormAdd = (props) => {
-    const [componentRole, setComponentRole] = useState('vpc');
+const FormAdd = (props:any) => {
     const [vpcipliststatus, setVpcipliststatus] = useState(false);
     
     const handleClick = (roleName:string)=>{
-        setComponentRole(roleName)
+        if (roleName == 'ec2'){
+            setVpcipliststatus(true)
+        }else{
+            setVpcipliststatus(false)
+        }
     }
     return (
         <PageContainer>
-            <Form>
+            <Form onFinish={async (value) => {
+                let items:TmplSourceListItem = Object.assign(value,{tmpl_id: Number(props.match.params.tmplid)})
+                let success = await handleAdd(items);
+                console.log(value)
+                // window.location.href="/tmpl_source_list/"+props.match.params.tmplid;
+                // if (success) {
+                    
+                // if (actionRef.current) {
+                //     actionRef.current.reload();
+                // }
+                history.push({
+                    pathname: '/tmpl_source/list/'+props.match.params.tmplid
+                });
+                }
+            }>
                 <Form.Item label="Name" name="name">
                     <Input placeholder="name" allowClear />
                 </Form.Item>
                 <Form.Item label="Role" name="role">
-                    <Radio.Group defaultValue="vpc" buttonStyle="solid">
-                        <Radio.Button value="vpc" onClick={()=>{handleClick('vpc')}}>vpc</Radio.Button>
+                    <Radio.Group  buttonStyle="solid">
+                        <Radio.Button value="vpc" onClick={()=>{handleClick('vpc')}} checked >vpc</Radio.Button>
                         <Radio.Button value="ec2" onClick={()=>{handleClick('ec2')}}>ec2</Radio.Button>
                         <Radio.Button value="elb" onClick={()=>{handleClick('elb')}}>elb</Radio.Button>
                         <Radio.Button value="rds" onClick={()=>{handleClick('rds')}}>rds</Radio.Button>
@@ -75,7 +96,7 @@ const FormAdd = (props) => {
                         <Radio.Button value="msk" onClick={()=>{handleClick('msk')}}>msk</Radio.Button>
                     </Radio.Group>
                 </Form.Item>
-                <RadioVpcId tmplid = {props.match.params.tmplid}/>       
+                <RadioVpcList tmplid = {props.match.params.tmplid} vpdListVisible = {vpcipliststatus} />       
                 <Form.Item label="remark" name="remark">
                     <Input placeholder="remark" allowClear />
                 </Form.Item>
@@ -91,9 +112,7 @@ const FormAdd = (props) => {
                 <Form.Item label="ssh_port" name="ssh_port">
                     <InputNumber min={1} max={65536} defaultValue={22}  />
                 </Form.Item>
-                <Form.Item label="" name="submit">
-                    <Button type="primary">submit</Button>
-                </Form.Item>
+                <Button type="primary" htmlType="submit">submit</Button>
             </Form>
         </PageContainer>
   );
