@@ -1,9 +1,9 @@
 import { PageHeaderWrapper } from '@ant-design/pro-layout';
 import React, { useState, useEffect, useRef } from 'react';
-import { Form,message,Radio,Input,InputNumber,Button,Modal } from 'antd';
+import { Form,message,Radio,Input,InputNumber,Button,Modal,Switch } from 'antd';
 import styles from './index.less';
-import { TmplSourceListItem } from './data';
-import { queryVpcList,  updateRule ,queryTsInfo} from './service';
+import { AssetListItem } from './data';
+import { queryVpcList,  updateRule ,queryInfo} from './service';
 import { PageContainer } from '@ant-design/pro-layout';
 // import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
 import { history } from 'umi';
@@ -12,7 +12,7 @@ import { history } from 'umi';
  * 更新节点
  * @param fields
  */
-const handleUpdate = async (fields: TmplSourceListItem) => {
+const handleUpdate = async (fields: AssetListItem) => {
   const hide = message.loading('正在配置');
   try {
     await updateRule({
@@ -34,7 +34,7 @@ const RadioVpcList = (props:any) => {
     const [loadVpcData, setLoadVpcData] = useState([]);
     
     useEffect(() => {
-        queryVpcList(props.tmplid).then((resp)=>{
+        queryVpcList(props.parentid).then((resp)=>{
           // console.log(resp)
           setLoadVpcData(resp)
           setVpcIsLoad(true)
@@ -69,7 +69,7 @@ const FormEdit = (props:any) => {
     const [itemLoadStatus, setitemLoadStatus] = useState(false);
     const [itemData, setitemData] = useState({});
     const [vpcId, setVpcId] = useState(0);
-    const [tmplId, setTmplId] = useState(0);
+    const [parentId, setParentId] = useState(0);
     // const actionRef = useRef<ActionType>();
     
     const handleClick = (roleName:string)=>{
@@ -80,11 +80,11 @@ const FormEdit = (props:any) => {
           setVpcId(0)
         }
     }
-    const tsid:string = props.match.params.tsid
+    const targetid:string = props.match.params.targetid
 
     useEffect(() => {
       // console.log(tsid)
-      queryTsInfo(tsid).then((resp)=>{
+      queryInfo(targetid).then((resp)=>{
         console.log(resp)
         setitemData(resp)
         setitemLoadStatus(true)
@@ -92,7 +92,7 @@ const FormEdit = (props:any) => {
           setVpcliststatus(true)
         }
         setVpcId(resp.vpc_id)
-        setTmplId(resp.tmpl_id)
+        setParentId(resp.project_id)
       })
     },[])
 
@@ -109,10 +109,12 @@ const FormEdit = (props:any) => {
           <PageContainer>
           <Form 
               onFinish={async (value) => {
+                value.buy = Number(value.buy)
+                value.del = Number(value.del)
                 Object.assign(value,{
-                  tmpl_id: tmplId,
+                  project_id: parentId,
                   vpc_id:vpcId,
-                  id:Number(tsid)
+                  id:Number(targetid)
                 })
                 console.log(value)
                 if ((value.role =="ec2") && (value.vpc_id ==0)) {
@@ -122,13 +124,14 @@ const FormEdit = (props:any) => {
                 let success = await handleUpdate(value);
                 // console.log(success)
                   if (success) {
-                      
+
                     // if (actionRef.current) {
                     //     actionRef.current.reload();
                     // }
+
                     history.push({
-                      pathname: '/tmpl_source/edit/'+tsid
-                  });
+                      pathname: '/asset/edit/'+targetid
+                    });
                   }
               }}
 
@@ -138,8 +141,15 @@ const FormEdit = (props:any) => {
                 remark: itemData.remark,
                 logicalid: itemData.logicalid,
                 type: itemData.type,
+                arn: itemData.arn,
+                ip_lan: itemData.ip_lan,
+                dns: itemData.dns,
+                endpoint: itemData.endpoint,
+                tbd: itemData.tbd,
                 ssh_user: itemData.ssh_user,
                 ssh_port: itemData.ssh_port,
+                buy: String(itemData.buy),
+                del: String(itemData.del),
 
               }}
               >
@@ -157,7 +167,7 @@ const FormEdit = (props:any) => {
                           <Radio.Button value="msk" onClick={()=>{handleClick('msk')}}>msk</Radio.Button>
                       </Radio.Group>
                   </Form.Item>
-                  <RadioVpcList tmplid = {itemData.tmpl_id} vpcid = {vpcId} vpdListVisible = {vpcliststatus} vpcIdValue = {(e)=>{
+                  <RadioVpcList parentid = {itemData.project_id} vpcid = {vpcId} vpdListVisible = {vpcliststatus} vpcIdValue = {(e)=>{
                     // console.log(e.target.value)
                     setVpcId(e.target.value)
                   }}/>       
@@ -170,11 +180,38 @@ const FormEdit = (props:any) => {
                   <Form.Item label="type" name="type">
                       <Input placeholder="type" allowClear />
                   </Form.Item>
+                  <Form.Item label="arn" name="arn">
+                    <Input placeholder="arn" allowClear />
+                  </Form.Item>
+                  <Form.Item label="ip_lan" name="ip_lan">
+                      <Input placeholder="ip_lan" allowClear />
+                  </Form.Item>
+                  <Form.Item label="dns" name="dns">
+                      <Input placeholder="dns" allowClear />
+                  </Form.Item>
+                  <Form.Item label="endpoint" name="endpoint">
+                      <Input placeholder="endpoint" allowClear />
+                  </Form.Item>
+                  <Form.Item label="tbd" name="tbd">
+                      <Input placeholder="tbd" allowClear />
+                  </Form.Item>
                   <Form.Item label="ssh_user" name="ssh_user">
                       <Input placeholder="ssh_user" allowClear />
                   </Form.Item>
                   <Form.Item label="ssh_port" name="ssh_port">
                       <InputNumber min={1} max={65536} defaultValue={22}  />
+                  </Form.Item>
+                  <Form.Item label="采购状态" name="buy">
+                    <Radio.Group  buttonStyle="solid">
+                      <Radio.Button value="0">未采购</Radio.Button>
+                      <Radio.Button value="1">已采购</Radio.Button>
+                    </Radio.Group>
+                  </Form.Item>
+                  <Form.Item label="状态" name="del">
+                      <Radio.Group  buttonStyle="solid">
+                        <Radio.Button value="0">启用</Radio.Button>
+                        <Radio.Button value="1">禁用</Radio.Button>
+                    </Radio.Group>
                   </Form.Item>
                   <Button type="primary" htmlType="submit">submit</Button>
               </Form>

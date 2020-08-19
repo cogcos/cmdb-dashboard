@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Form, Button, Input, Modal } from 'antd';
 
-import { ProjectListItem } from '../data';
+import { TmplSourceListItem } from '../data';
 
-export interface FormValueType extends Partial<ProjectListItem> {
+export interface FormValueType extends Partial<TmplSourceListItem> {
   target?: string;
   template?: string;
   type?: string;
@@ -15,7 +15,7 @@ export interface UpdateFormProps {
   onCancel: (flag?: boolean, formVals?: FormValueType) => void;
   onSubmit: (values: FormValueType) => void;
   updateModalVisible: boolean;
-  values: Partial<ProjectListItem>;
+  values: Partial<TmplSourceListItem>;
 }
 const FormItem = Form.Item;
 const { TextArea } = Input;
@@ -32,10 +32,9 @@ const formLayout = {
 
 const UpdateForm: React.FC<UpdateFormProps> = (props) => {
   const [formVals, setFormVals] = useState<FormValueType>({
-    id: props.values.id,
     name: props.values.name,
-    env: props.values.env,
-    ssh_key_path: props.values.ssh_key_path,
+    id: props.values.id,
+    // ssh_key_path: props.values.ssh_key_path,
   });
 
   // const [currentStep, setCurrentStep] = useState<number>(0);
@@ -75,18 +74,60 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
           <Input placeholder="请输入" />
         </FormItem>
         <FormItem
-          name="env"
-          label="env"
-          rules={[{ required: true, message: '请输入！' }]}
+          name="role"
+          label="名称"
+          rules={[{ required: true, message: '请输入名称！' }]}
         >
           <Input placeholder="请输入" />
         </FormItem>
         <FormItem
-          name="ssh_key_path"
-          label="私钥路径"
-          rules={[{ required: true, message: '请输入至少五个字符的路径！', min: 5 }]}
+          name="tmpl_id"
+          label="名称"
+          rules={[{ required: true, message: '请输入名称！' }]}
         >
-          <TextArea rows={4} placeholder="请输入至少五个字符" />
+          <Input placeholder="请输入" />
+        </FormItem>
+        <FormItem
+          name="vpc_id"
+          label="名称"
+          rules={[{ required: true, message: '请输入名称！' }]}
+        >
+          <Input placeholder="请输入" />
+        </FormItem>
+        <FormItem
+          name="remark"
+          label="名称"
+          rules={[{ required: true, message: '请输入名称！' }]}
+        >
+          <Input placeholder="请输入" />
+        </FormItem>
+        <FormItem
+          name="logicalid"
+          label="名称"
+          rules={[{ required: true, message: '请输入名称！' }]}
+        >
+          <Input placeholder="请输入" />
+        </FormItem>
+        <FormItem
+          name="type"
+          label="名称"
+          rules={[{ required: true, message: '请输入名称！' }]}
+        >
+          <Input placeholder="请输入" />
+        </FormItem>
+        <FormItem
+          name="ssh_user"
+          label="名称"
+          rules={[{ required: true, message: '请输入名称！' }]}
+        >
+          <Input placeholder="请输入" />
+        </FormItem>
+        <FormItem
+          name="ssh_port"
+          label="名称"
+          rules={[{ required: true, message: '请输入名称！' }]}
+        >
+          <Input placeholder="请输入" />
         </FormItem>
       </>
     );
@@ -118,8 +159,7 @@ const UpdateForm: React.FC<UpdateFormProps> = (props) => {
         form={form}
         initialValues={{
           name: formVals.name,
-          env: formVals.env,
-          ssh_key_path: formVals.ssh_key_path,
+          // ssh_key_path: formVals.ssh_key_path,
         }}
       >
         {renderContent()}

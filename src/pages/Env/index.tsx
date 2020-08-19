@@ -221,7 +221,7 @@ const TableList: React.FC<{}> = () => {
       valueType: 'option',
       render: (_, record) => (
         <>
-            <Button type="default" shape="round"
+            {/* <Button type="default" shape="round"
               onClick={() => {
                 handleUpdateModalVisible(true);
                 setStepFormValues(record);
@@ -229,11 +229,11 @@ const TableList: React.FC<{}> = () => {
             >
               编辑
             </Button>
-            <Divider type="vertical" />
+            <Divider type="vertical" /> */}
             <Button type="primary" shape="round"
               onClick={() => {
                 history.push({
-                  pathname: '/asset/list/'+record.id
+                  pathname: '/env/asset/list/'+record.id
                 });
 
               }}
@@ -243,12 +243,12 @@ const TableList: React.FC<{}> = () => {
             <Divider type="vertical" />
             <Button type="default" 
               onClick={() => {
-                console.log("触发采购")
+                console.log("触发部署")
               }}
             >
-              采购
+              部署
             </Button>
-            <Divider type="vertical" />
+            {/* <Divider type="vertical" />
             <Button danger
               onClick={async () => {
                 await handleRemove(record);
@@ -256,7 +256,7 @@ const TableList: React.FC<{}> = () => {
               }}
             >
               禁用
-            </Button>
+            </Button> */}
         </>
       ),
     },
@@ -268,11 +268,11 @@ const TableList: React.FC<{}> = () => {
         headerTitle="查询表格"
         actionRef={actionRef}
         rowKey="id"
-        toolBarRender={() => [
-          <Button type="primary" onClick={() => handleModalVisible(true)}>
-            <PlusOutlined /> 新建
-          </Button>,
-        ]}
+        // toolBarRender={() => [
+          // <Button type="primary" onClick={() => handleModalVisible(true)}>
+          //   <PlusOutlined /> 新建
+          // </Button>,
+        // ]}
         // request={(params, sorter, filter) => queryRule({ ...params, sorter, filter })}
         request={(params, sorter, filter) => queryRule({ ...params })}
         // request={(params, sorter, filter) => {
@@ -368,5 +368,4 @@ const TableList: React.FC<{}> = () => {
     </PageContainer>
   );
 };
-
 export default TableList;
