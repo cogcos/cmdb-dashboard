@@ -78,7 +78,7 @@ const FormAdd = (props:any) => {
                     // }
 
                     history.push({
-                        pathname: '/asset/list/'+props.match.params.targetid
+                        pathname: '/caigou/asset/list/'+props.match.params.targetid
                     });
                 }
             }>

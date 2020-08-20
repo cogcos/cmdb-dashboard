@@ -168,7 +168,7 @@ const TableList: React.FC<{}> = (props) => {
           <Button type="primary" shape="round"
             onClick={() => {
               history.push({
-                pathname: '/asset/edit/'+record.id
+                pathname: '/caigou/asset/edit/'+record.id
               });
             }}
           >
@@ -197,7 +197,7 @@ const TableList: React.FC<{}> = (props) => {
         toolBarRender={() => [
           <Button type="primary" onClick={() => {
             history.push({
-              pathname: '/asset/add/'+props.match.params.targetid
+              pathname: '/caigou/asset/add/'+props.match.params.targetid
             });
           }}>
             <PlusOutlined /> 新建

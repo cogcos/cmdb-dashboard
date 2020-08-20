@@ -82,7 +82,7 @@ export default defineConfig({
               icon: 'table',
               path: '/list',
               component: './ListTableList',
-              hideInMenu:false,
+              hideInMenu:true,
             },
             {
               path: '/caigou',

@@ -130,7 +130,7 @@ const FormEdit = (props:any) => {
                     // }
 
                     history.push({
-                      pathname: '/asset/edit/'+targetid
+                      pathname: '/caigou/asset/edit/'+targetid
                     });
                   }
               }}

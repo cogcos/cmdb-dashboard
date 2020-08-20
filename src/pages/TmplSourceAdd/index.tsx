@@ -78,7 +78,7 @@ const FormAdd = (props:any) => {
                 //     actionRef.current.reload();
                 // }
                 history.push({
-                    pathname: '/tmpl_source/list/'+props.match.params.tmplid
+                    pathname: '/caigou/tmpl_source/list/'+props.match.params.tmplid
                 });
                 }
             }>

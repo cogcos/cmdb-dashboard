@@ -129,7 +129,7 @@ const TableList: React.FC<{}> = () => {
             <Button type="primary" shape="round"
               onClick={() => {
                 history.push({
-                  pathname: '/tmpl_source/list/'+record.id
+                  pathname: '/caigou/tmpl_source/list/'+record.id
                 });
 
               }}

@@ -127,7 +127,7 @@ const FormEdit = (props:any) => {
                     //     actionRef.current.reload();
                     // }
                     history.push({
-                      pathname: '/tmpl_source/edit/'+tsid
+                      pathname: '/caigou/tmpl_source/edit/'+tsid
                   });
                   }
               }}
