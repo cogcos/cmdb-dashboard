@@ -1,23 +1,34 @@
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, Divider, message, Input,Select ,Form} from 'antd';
-const { Option } = Select;
-import React, { useState, useRef,useEffect } from 'react';
+import { Button, Divider, message, Input } from 'antd';
+import React, { useState, useRef } from 'react';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import ProTable, { ProColumns, ActionType } from '@ant-design/pro-table';
 
 import CreateForm from './components/CreateForm';
 import UpdateForm, { FormValueType } from './components/UpdateForm';
-import { ProjectListItem } from './data';
-import { queryRule, updateRule, addRule, removeRule,queryTmplList } from './service';
+import { DeployRoleListItem } from './data.d';
+import { queryRule, updateRule, addRule, removeRule } from './service';
 import { history } from 'umi';
 
 /**
  * 添加节点
  * @param fields
  */
-const handleAdd = async (fields: ProjectListItem) => {
+const handleAdd = async (fields: DeployRoleListItem) => {
   const hide = message.loading('正在添加');
   try {
+    if (typeof(fields.port) != "undefined"){
+      fields.port = Number(fields.port)
+    }
+    if (typeof(fields.db_port) != "undefined"){
+      fields.db_port = Number(fields.db_port)
+    }
+    if (typeof(fields.es_http_port) != "undefined"){
+      fields.es_http_port = Number(fields.es_http_port)
+    }
+    if (typeof(fields.es_tcp_port) != "undefined"){
+      fields.es_tcp_port = Number(fields.es_tcp_port)
+    }
     await addRule({ ...fields });
     hide();
     message.success('添加成功');
@@ -39,8 +50,17 @@ const handleUpdate = async (fields: FormValueType) => {
     await updateRule({
       id: fields.id,
       name: fields.name,
-      env: fields.env,
-      ssh_key_path: fields.ssh_key_path,
+      release: fields.release,
+      port: fields.port,
+      url: fields.url,
+      db_host: fields.db_host,
+      db_port: fields.db_port,
+      db_name: fields.db_name,
+      db_user: fields.db_user,
+      db_passwd: fields.db_passwd,
+      es_http_port: fields.es_http_port,
+      es_tcp_port: fields.es_tcp_port,
+      del: Number(fields.del),
     });
     hide();
 
@@ -57,7 +77,7 @@ const handleUpdate = async (fields: FormValueType) => {
  *  删除节点
  * @param selectedRows
  */
-const handleRemove = async (selectedRows: ProjectListItem) => {
+const handleRemove = async (selectedRows: DeployRoleListItem) => {
   const hide = message.loading('正在删除');
   if (!selectedRows) return true;
   try {
@@ -74,71 +94,16 @@ const handleRemove = async (selectedRows: ProjectListItem) => {
   }
 };
 
-const TmplList = (props:any) => {
-  const [isLoad, setIsLoad] = useState(false);
-  const [loadData, setLoadData] = useState([]);
-  
-  useEffect(() => {
-      queryTmplList().then((resp)=>{
-          console.log(resp.data)
-          setLoadData(resp.data)
-          setIsLoad(true)
-      })
-  },[])
-  if (props.vpdListVisible==false){
-      return (
-          <></>
-      )
-  }else if (isLoad == false) {
-      return (
-        <Select defaultValue="loading" style={{ width: 120 }} loading>
-          <Option value="loading">Loading</Option>
-        </Select>
-      );
-  }else{
-      return (
-          <Form.Item label="模板" name="tmpl_id">
-            <Select style={{ width: 120 }}>
-              {loadData.map((item) => (
-                <Option value={item.id}>{item.name}</Option>
-              ))}
-            </Select>
-          </Form.Item>
-      )
-  }
-}
-
-const FormAdd = (props:any) => {
-  const { onSubmit } = props;
-
-  return (
-          <Form onFinish={(value) => onSubmit(value)}>
-              <Form.Item label="Name" name="name">
-                  <Input placeholder="name" allowClear />
-              </Form.Item>
-              <Form.Item label="env" name="env">
-                  <Input placeholder="env" allowClear />
-              </Form.Item>
-              
-              <TmplList />       
-              
-              <Button type="primary" htmlType="submit">submit</Button>
-          </Form>
-);
-};
-
-
 const TableList: React.FC<{}> = () => {
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
   const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
   const [stepFormValues, setStepFormValues] = useState({});
   const actionRef = useRef<ActionType>();
-  const [selectedRowsState, setSelectedRows] = useState<ProjectListItem[]>([]);
-  const columns: ProColumns<ProjectListItem>[] = [
+  const [selectedRowsState, setSelectedRows] = useState<DeployRoleListItem[]>([]);
+  const columns: ProColumns<DeployRoleListItem>[] = [
     {
       title: '名称',
       dataIndex: 'name',
-      hideInSearch: true,
       rules: [
         {
           required: true,
@@ -147,8 +112,9 @@ const TableList: React.FC<{}> = () => {
       ],
     },
     {
-      title: 'env',
-      dataIndex: 'env',
+      title: '版本',
+      dataIndex: 'release',
+      // valueType: 'textarea',
       hideInSearch: true,
       rules: [
         {
@@ -158,36 +124,62 @@ const TableList: React.FC<{}> = () => {
       ],
     },
     {
-      title: '模板名称',
-      dataIndex: 'tmpl_name',
-      hideInSearch: true,
+      title: '端口',
+      dataIndex: 'port',
+      rules: [
+        {
+          required: true,
+          message: '必填项',
+        },
+      ],
     },
     {
-      title: 'sshKeyPath',
-      dataIndex: 'ssh_key_path',
-      valueType: 'textarea',
+      title: '文件路径',
+      dataIndex: 'url',
       hideInSearch: true,
       hideInTable: true,
     },
     {
-      title: '采购状态',
-      dataIndex: 'buy',
-      hideInForm: true,
+      title: 'db_host',
+      dataIndex: 'db_host',
       hideInSearch: true,
-      valueEnum: {
-        0: { text: '未采购', status: 'Default' },
-        1: { text: '开始采购', status: 'Processing' },
-        2: { text: '采购失败', status: 'Error' },
-        3: { text: '采购完成', status: 'Success' },
-      },
+      hideInTable: true,
     },
     {
-      title: '采购时间',
-      dataIndex: 'buy_time',
-      sorter: false,
-      valueType: 'dateTime',
-      hideInForm: true,
+      title: 'db_port',
+      dataIndex: 'db_port',
       hideInSearch: true,
+      hideInTable: true,
+    },
+    {
+      title: 'db_name',
+      dataIndex: 'db_name',
+      hideInSearch: true,
+      hideInTable: true,
+    },
+    {
+      title: 'db_user',
+      dataIndex: 'db_user',
+      hideInSearch: true,
+      hideInTable: true,
+    },
+    {
+      title: 'db_passwd',
+      dataIndex: 'db_passwd',
+      hideInSearch: true,
+      hideInTable: true,
+    },
+    {
+      title: 'es_http_port',
+      dataIndex: 'es_http_port',
+      hideInSearch: true,
+      hideInTable: true,
+    },
+    {
+      title: 'es_tcp_port',
+      dataIndex: 'es_tcp_port',
+      hideInSearch: true,
+      hideInTable: true,
     },
     {
       title: '创建时间',
@@ -221,7 +213,7 @@ const TableList: React.FC<{}> = () => {
       valueType: 'option',
       render: (_, record) => (
         <>
-            {/* <Button type="default" shape="round"
+            <Button type="primary" shape="round"
               onClick={() => {
                 handleUpdateModalVisible(true);
                 setStepFormValues(record);
@@ -229,45 +221,26 @@ const TableList: React.FC<{}> = () => {
             >
               编辑
             </Button>
-            <Divider type="vertical" /> */}
+            {/* <Divider type="vertical" />
             <Button type="primary" shape="round"
               onClick={() => {
                 history.push({
-                  pathname: '/env/asset/list/'+record.id
+                  pathname: '/caigou/DeployRole_source/list/'+record.id
                 });
 
               }}
             >
               配置
-            </Button>
-            <Divider type="vertical" />
-            <Button type="primary" shape="round"
-              onClick={() => {
-                history.push({
-                  pathname: '/deploy/division/detail/'+record.id
-                });
-
-              }}
-            >
-              分工
-            </Button>
-            <Divider type="vertical" />
-            <Button type="default" 
-              onClick={() => {
-                console.log("触发部署")
-              }}
-            >
-              部署
-            </Button>
-            {/* <Divider type="vertical" />
-            <Button danger
-              onClick={async () => {
-                await handleRemove(record);
-                actionRef.current?.reloadAndRest();
-              }}
-            >
-              禁用
             </Button> */}
+          <Divider type="vertical" />
+          <Button danger
+            onClick={async () => {
+              await handleRemove(record);
+              actionRef.current?.reloadAndRest();
+            }}
+          >
+            禁用
+          </Button>
         </>
       ),
     },
@@ -275,15 +248,15 @@ const TableList: React.FC<{}> = () => {
 
   return (
     <PageContainer>
-      <ProTable<ProjectListItem>
+      <ProTable<DeployRoleListItem>
         headerTitle="查询表格"
         actionRef={actionRef}
         rowKey="id"
-        // toolBarRender={() => [
-          // <Button type="primary" onClick={() => handleModalVisible(true)}>
-          //   <PlusOutlined /> 新建
-          // </Button>,
-        // ]}
+        toolBarRender={() => [
+          <Button type="primary" onClick={() => handleModalVisible(true)}>
+            <PlusOutlined /> 新建
+          </Button>,
+        ]}
         // request={(params, sorter, filter) => queryRule({ ...params, sorter, filter })}
         request={(params, sorter, filter) => queryRule({ ...params })}
         // request={(params, sorter, filter) => {
@@ -326,9 +299,8 @@ const TableList: React.FC<{}> = () => {
         </FooterToolbar>
       )}
       <CreateForm onCancel={() => handleModalVisible(false)} modalVisible={createModalVisible}>
-        {/* <ProTable<ProjectListItem, ProjectListItem>
+        <ProTable<DeployRoleListItem, DeployRoleListItem>
           onSubmit={async (value) => {
-            console.log(value)
             const success = await handleAdd(value);
             if (success) {
               handleModalVisible(false);
@@ -341,18 +313,6 @@ const TableList: React.FC<{}> = () => {
           type="form"
           columns={columns}
           rowSelection={{}}
-        /> */}
-        <FormAdd 
-          onSubmit={async (value) => {
-            console.log(value)
-            const success = await handleAdd(value);
-            if (success) {
-              handleModalVisible(false);
-              if (actionRef.current) {
-                actionRef.current.reload();
-              }
-            }
-          }}
         />
       </CreateForm>
       {stepFormValues && Object.keys(stepFormValues).length ? (
@@ -379,4 +339,5 @@ const TableList: React.FC<{}> = () => {
     </PageContainer>
   );
 };
+
 export default TableList;

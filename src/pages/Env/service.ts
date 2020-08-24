@@ -3,7 +3,7 @@ import { ProjectListParams, ProjectListItem } from './data';
 
 export async function queryRule(params?: ProjectListParams) {
     // console.log(REACT_APP_ENV)
-  return request('/api/projectlist', {
+  return request('/api/envlist', {
     params,
   });
 }

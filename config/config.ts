@@ -177,11 +177,33 @@ export default defineConfig({
               ],
             },
             {
-              name: '空白页面',
+              path: '/deploy',
+              name: '部署',
+              icon: 'crown',
+              // component: './Admin',
+              // authority: ['admin'],
+              routes: [
+                {
+                  name: '角色',
+                  icon: 'smile',
+                  path: '/deploy/role/list',
+                  component: './DeployRole',
+                },
+                {
+                  name: '分工详情',
+                  icon: 'smile',
+                  path: '/deploy/division/detail/:targetid',
+                  component: './DeployDivisionDetail',
+                  hideInMenu:true,
+                },
+              ],
+            },
+            {
+              name: '检查',
               icon: 'smile',
               path: '/emptypage',
               component: './EmptyPage',
-              hideInMenu:true,
+              hideInMenu:false,
             },
             {
               component: './404',
